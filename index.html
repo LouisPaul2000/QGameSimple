@@ -1,20 +1,172 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quantum Collapse</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <title>Quantum Collapse</title>
+  <style>
+    /* ===== CSS ===== */
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: black;
+      color: white;
+      margin: 0;
+      padding: 0;
+    }
+
+    #game-container {
+      margin-top: 50px;
+      width: 90%;
+      max-width: 600px;
+      margin: auto;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+    }
+
+    #game-info {
+      margin: 10px 0;
+    }
+
+    #choices {
+      margin: 20px 0;
+    }
+
+    .choice {
+      display: inline-block;
+      padding: 10px 20px;
+      margin: 5px;
+      border: 2px solid white;
+      cursor: pointer;
+      font-size: 18px;
+      text-align: center;
+    }
+
+    .choice:hover {
+      background-color: grey;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: purple;
+      color: white;
+      border: none;
+      cursor: pointer;
+      margin-top: 20px;
+      display: block;
+      width: 80%;
+      max-width: 200px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    button:hover {
+      background-color: violet;
+    }
+
+    #result {
+      margin: 15px 0;
+      font-weight: bold;
+    }
+
+    canvas {
+      margin-top: 20px;
+      background-color: black;
+      border: 1px solid white;
+      width: 100%;
+    }
+  </style>
 </head>
 <body>
-    <div id="game-container">
-        <h1>Quantum Collapse</h1>
-        <p id="game-info">Choose a quantum state to collapse:</p>
-        <div id="choices"></div>
-        <button id="collapse-btn" onclick="collapseWave()">Collapse Wave Function</button>
-        <p id="result"></p>
-        <canvas id="quantum-visual"></canvas>
-    </div>
-    <script src="script.js"></script>
+  <div id="game-container">
+    <h1>Quantum Collapse</h1>
+    <p id="game-info">Choose a quantum state to collapse:</p>
+    <div id="choices"></div>
+    <button id="collapse-btn">Collapse Wave Function</button>
+    <p id="result"></p>
+    <canvas id="quantum-visual"></canvas>
+  </div>
+
+  <script>
+    // ===== JavaScript =====
+    document.addEventListener("DOMContentLoaded", function() {
+      const states = [
+        { name: "Ψ1 |0⟩", probability: 0.5 },
+        { name: "Ψ2 |1⟩", probability: 0.3 },
+        { name: "Ψ3 |Superposition⟩", probability: 0.2 }
+      ];
+
+      let selectedState = null;
+      const choiceContainer = document.getElementById("choices");
+      const collapseBtn = document.getElementById("collapse-btn");
+      const resultText = document.getElementById("result");
+      const gameInfo = document.getElementById("game-info");
+      const canvas = document.getElementById("quantum-visual");
+      const ctx = canvas.getContext("2d");
+
+      // Create choice buttons
+      states.forEach((state, index) => {
+        let btn = document.createElement("div");
+        btn.classList.add("choice");
+        btn.innerText = state.name;
+        btn.addEventListener("click", () => selectState(index));
+        choiceContainer.appendChild(btn);
+      });
+
+      // Attach event listener to button
+      collapseBtn.addEventListener("click", collapseWave);
+
+      // Select a quantum state
+      function selectState(index) {
+        selectedState = states[index];
+        gameInfo.innerText = `Selected: ${selectedState.name}`;
+      }
+
+      // Collapse wave function
+      function collapseWave() {
+        if (!selectedState) {
+          resultText.innerText = "Select a state first!";
+          return;
+        }
+
+        let rand = Math.random();
+        let cumulativeProb = 0;
+        let outcome = "Unknown";
+
+        for (let state of states) {
+          cumulativeProb += state.probability;
+          if (rand < cumulativeProb) {
+            outcome = state.name;
+            break;
+          }
+        }
+
+        resultText.innerText = `Collapsed to: ${outcome}`;
+        drawQuantumEffect(outcome);
+      }
+
+      // Draw the quantum effect on the canvas
+      function drawQuantumEffect(outcome) {
+        // Make canvas responsive
+        canvas.width = window.innerWidth * 0.8; // or a fixed 600 if you prefer
+        canvas.height = 300;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "white";
+
+        // Draw random circles
+        for (let i = 0; i < 10; i++) {
+          let x = Math.random() * canvas.width;
+          let y = Math.random() * canvas.height;
+          let size = outcome.includes("Superposition") ? 15 : 10;
+          ctx.beginPath();
+          ctx.arc(x, y, size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+    });
+  </script>
 </body>
 </html>
